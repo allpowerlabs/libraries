@@ -8,12 +8,26 @@ typedef struct gpio {
 #ifdef __cplusplus
 extern "C" {
 #endif
-void gpio_set_ddr(gpio_s*);				// Set bit in DDR
-void gpio_clr_ddr(gpio_s*);				// Clear bit in DDR
-void gpio_set_pin(gpio_s*);				// Set pin in PORT
-void gpio_clr_pin(gpio_s*);				// Clear pin in PORT
-unsigned char gpio_get_pin(gpio_s*);	// Get PIN value
 
+#ifndef _BV
+#define _BV(bit) (1<<(bit))
+#endif
+
+// Set bit in DDR
+inline
+void gpio_set_ddr(gpio_s p){*(p.port - 1) |= _BV(p.pin);}
+// Clear bit in DDR
+inline
+void gpio_clr_ddr(gpio_s p){*(p.port - 1) &= 0xFF & ~_BV(p.pin);}
+// Set pin in PORT
+inline
+void gpio_set_pin(gpio_s p){*p.port |= _BV(p.pin);}
+// Clear pin in PORT
+inline
+void gpio_clr_pin(gpio_s p){*p.port &= 0xFF & ~_BV(p.pin);}
+// Get PIN value
+inline
+unsigned char gpio_get_pin(gpio_s p){return *(p.port - 2);}
 #ifdef __cplusplus
 }
 #endif
