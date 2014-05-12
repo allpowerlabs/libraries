@@ -5,6 +5,11 @@
 // around these register accesses, but unfortunately we'd have to switch
 // to compiling this with C99, which isn't supported by the Arduino IDE.
 //#include <util/atomic.h>
+#include <avr/interrupt.h>
+
+#define TIMER_COMPA 0
+#define TIMER_COMPB 1
+#define TIMER_COMPC 2
 
 #define TIMER_WGM_MASK_A 0x02
 #define TIMER_WGM_MASK_B 0x18
@@ -21,6 +26,7 @@ typedef void (* timer_int_f)();
 
 typedef struct {
 	timer_t	t;			// Timer identity
+/* 	
 	timer_int_f cmp;	// Compare match vector
 	timer_int_f ovf;	// Overflow vector
 	union {
@@ -58,22 +64,24 @@ typedef struct {
 		} bit;
 		uint8_t reg;
 	} tccrc;
-} timer16_s;
+	 */
+} timer_s;
 
-extern timer16_s timer1;
-extern timer16_s timer3;
-extern timer16_s timer4;
-extern timer16_s timer5;
+extern timer_s timer0;
+extern timer_s timer1;
+extern timer_s timer2;
+extern timer_s timer3;
+extern timer_s timer4;
+extern timer_s timer5;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// Init routine for timer 5, which we use for monitoring the H-bridge
-void timer16_init(timer16_s *);
+void timer_init(timer_s *);
 
 extern inline
-void timer16_reset(timer16_s *t) {
+void timer_reset(timer_s *t) {
 	//ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 		// Zero output compare registers
 		OCR5AH = 0;
@@ -84,7 +92,7 @@ void timer16_reset(timer16_s *t) {
 	//}
 }
 extern inline 
-void timer16_stop(timer16_s *t) {
+void timer_stop(timer_s *t) {
 	//ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 		// Stop timer and disable interrupts
 		TCCR5B = 0;				// Disconnect prescaler
@@ -94,15 +102,23 @@ void timer16_stop(timer16_s *t) {
 	//}
 }
 extern inline 
-void timer16_start(timer16_s *t) {
+void timer_start(timer_s *t) {
 	//ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
 		// Enable interrupts and start timer
 		TIMSK5 |= _BV(OCIE5A)	// Output compare A interrupt enable
 			| _BV(TOIE5)		// Overflow interrupt enable
 		;
-		TCCR5B = _BV(CS51) | _BV(CS50);  //Normal mode, clk/64 (4uS)
+		TCCR5B = 0
+			//| _BV(CS52) 
+			//| _BV(CS51) 
+			| _BV(CS50)
+			;  //Normal mode, clk/64 (4uS)
 	//}
 }
+
+void timer_set_ocr(timer_t, uint8_t);
+uint16_t timer_get_ocr(timer_t, uint8_t);
+
 
 #ifdef __cplusplus
 }

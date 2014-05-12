@@ -27,7 +27,7 @@ inline
 void gpio_clr_pin(gpio_s p){*p.port &= 0xFF & ~_BV(p.pin);}
 // Get PIN value
 inline
-unsigned char gpio_get_pin(gpio_s p){return *(p.port - 2);}
+unsigned char gpio_get_pin(gpio_s p){return *(p.port - 2) & _BV(p.pin);}
 #ifdef __cplusplus
 }
 #endif
