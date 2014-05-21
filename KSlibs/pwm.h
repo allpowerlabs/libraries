@@ -1,72 +1,51 @@
 #ifndef PWM_H
 #define PWM_H
 
-#include "intmath.h"
-#include "gpio.h"
-#include "timer.h"
+#include <stdint.h>
+//#include "intmath.h"
+//#include "timer.h"
+//#include "gpio.h"
+
+#define PWM_COM_OFF 0
+#define PWM_COM_TOGGLE 1
+#define PWM_COM_CLEAR 2
+#define PWM_COM_SET 3
+
+#define PWM_MAX 255
 
 typedef struct {
-	gpio_s pin;
-	timer_s * timer;
-	uint8_t compreg;
-	//volatile uint16_t * tcomp;			// Timer compare register pointer
+	//const timer_s * timer;
+	uint8_t * ocr;
 } pwm_s;
+
+extern pwm_s pwm0;
+extern pwm_s pwm1;
+extern pwm_s pwm2;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void pwm_reset(pwm_s*);
-void pwm_stop(pwm_s*);
-void pwm_start(pwm_s*);
+void pwm_init();
 
-void pwm_set_duty(pwm_s*, uint16_t);
-uint16_t pwm_get_duty(pwm_s*);
+// void pwm_stop(pwm_s*);
+// void pwm_start(pwm_s*);
 
-//void pwm_set_target(pwm_s*, uint16_t);
+void pwm_set_duty(pwm_s*, uint8_t);
+uint8_t pwm_get_duty(pwm_s*);
 
 // All functions are inlined for maximum performance
 
 extern inline
-void pwm_reset(pwm_s* p){
-	// Reset the pin
-	gpio_set_ddr(p->pin);
-	gpio_clr_pin(p->pin);
-	// Reset duty to 0
-	pwm_set_duty(p, 0);
+void pwm_set_duty(pwm_s* p, uint8_t duty){
+	*p->ocr = duty;
 }
 extern inline
-void pwm_stop(pwm_s* p){
-	//Stop timer
-	if (p->timer) timer_stop(p->timer);
-	gpio_clr_pin(p->pin); 
-}
-extern inline
-void pwm_start(pwm_s* p){
-	//Start timer
-	if (p->timer) timer_start(p->timer);
-}
-extern inline
-void pwm_set_duty(pwm_s* p, unsigned int duty){
-	// Set timer compare register
-	timer_set_ocr(p->timer, p->compreg, duty);
-}
-extern inline
-uint16_t pwm_get_duty(pwm_s* p){
+uint8_t pwm_get_duty(pwm_s* p){
 	// Get timer compare register
-	return timer_get_ocr(p->timer, p->compreg);
+	return *p->ocr;
 }
 
-// PWM ISRs.
-
-extern inline
-void pwm_cmp(pwm_s* p){
-	gpio_clr_pin(p->pin);
-}
-extern inline
-void pwm_ovf(pwm_s* p){
-	gpio_set_pin(p->pin);
-}
 #ifdef __cplusplus
 }
 #endif

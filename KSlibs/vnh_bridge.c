@@ -81,8 +81,8 @@ void vnh_reverse(vnh_s* v){
 void vnh_brake(vnh_s* v){
 	vnh_disable(v);			// Disable outputs
 	// A=lo, B=lo
-	gpio_clr_pin(v->mota);
-	gpio_clr_pin(v->motb);
+	gpio_set_pin(v->mota);
+	gpio_set_pin(v->motb);
 	vnh_enable(v);			// Enable outputs
 	v->mode = VNH_BRAKE;
 }

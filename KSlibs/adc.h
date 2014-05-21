@@ -1,6 +1,10 @@
 #include <stdint.h>
 #include <avr/io.h>
 
+typedef struct {
+	unsigned n;
+} adc_s;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
