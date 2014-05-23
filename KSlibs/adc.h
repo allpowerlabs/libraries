@@ -1,9 +1,8 @@
 #include <stdint.h>
 #include <avr/io.h>
 
-typedef struct {
-	unsigned n;
-} adc_s;
+// ADC channel as opaque structure
+typedef struct adc_s;
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,6 +21,9 @@ void ADC_Init();
 void ADC_Reset();
 uint16_t ADC_ReadChanSync(unsigned chan);
 extern int ANA_available[8];
+
+// Future ADC API
+uint16_t adc_read(adc_s *);
 
 // 10 bits
 #define ADC_MAXCOUNT (1024l)

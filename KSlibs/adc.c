@@ -3,6 +3,10 @@
 
 #include "util.h"
 
+typedef struct {
+	unsigned n;
+} adc_s;
+
 int ANA_available[8];
 
 void ADC_Init() {
@@ -69,4 +73,9 @@ uint16_t ADC_ReadChanSync(unsigned chan) {
 	adc = ADCL;
 	adc |= ADCH << 8;
 	return adc;
+}
+
+// This is part of the future ADC API
+uint16_t adc_read(adc_s * c) {
+	return ADC_ReadChanSync(c->n);
 }
