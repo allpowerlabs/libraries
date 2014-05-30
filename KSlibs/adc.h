@@ -2,7 +2,16 @@
 #include <avr/io.h>
 
 // ADC channel as opaque structure
-typedef struct adc_s;
+typedef struct adc_s adc_s;
+
+extern adc_s ADC0;
+extern adc_s ADC1;
+extern adc_s ADC2;
+extern adc_s ADC3;
+extern adc_s ADC4;
+extern adc_s ADC5;
+extern adc_s ADC6;
+extern adc_s ADC7;
 
 #ifdef __cplusplus
 extern "C" {

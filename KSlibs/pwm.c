@@ -3,9 +3,9 @@
 #include <avr/io.h>
 #include "pwm.h"
 
-pwm_s pwm0 = {&OCR1AL};
-pwm_s pwm1 = {&OCR1BL};
-pwm_s pwm2 = {&OCR1CL};
+pwm_s PWM0 = {&OCR1AL};
+pwm_s PWM1 = {&OCR1BL};
+pwm_s PWM2 = {&OCR1CL};
 
 void timer1_init(void) {
 	// Set output compare registers
@@ -17,7 +17,7 @@ void timer1_init(void) {
 	// Timer 1 control registers
 	TCCR1A = 0
 		| _BV(WGM10)		// Phase correct PWM
-		| _BV(COM1A1)
+	//	| _BV(COM1A1)
 		| _BV(COM1B1)
 		| _BV(COM1C1)
 	;

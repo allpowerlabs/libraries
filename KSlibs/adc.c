@@ -7,6 +7,15 @@ typedef struct {
 	unsigned n;
 } adc_s;
 
+adc_s ADC0 = {0};
+adc_s ADC1 = {1};
+adc_s ADC2 = {2};
+adc_s ADC3 = {3};
+adc_s ADC4 = {4};
+adc_s ADC5 = {5};
+adc_s ADC6 = {6};
+adc_s ADC7 = {7};
+
 int ANA_available[8];
 
 void ADC_Init() {

@@ -18,9 +18,9 @@ typedef struct {
 	uint8_t * ocr;
 } pwm_s;
 
-extern pwm_s pwm0;
-extern pwm_s pwm1;
-extern pwm_s pwm2;
+extern pwm_s PWM0;
+extern pwm_s PWM1;
+extern pwm_s PWM2;
 
 #ifdef __cplusplus
 extern "C" {
