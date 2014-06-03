@@ -1,146 +1,84 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <stdint.h>
+#include <limits.h>
 #include "timer.h"
 
-#ifndef NULL
-#define NULL 0
-#endif
+volatile timer_s * timer_head;
 
-const timer_s timer0 = {
-	TIMER_TYPE_0,
-	&TCCR0A,
-	&TCCR0B,
-	NULL,
-	&TCNT0,
-	NULL,
-	&OCR0A,
-	NULL,
-	&OCR0B,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	&TIMSK0,
-	&TIFR0,
-	NULL
-};
-
-const timer_s timer2 = {
-	TIMER_TYPE_2,
-	&TCCR2A,
-	&TCCR2B,
-	NULL,
-	&TCNT2,
-	NULL,
-	&OCR2A,
-	NULL,
-	&OCR2B,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	&ASSR,
-	&TIMSK2,
-	&TIFR2,
-	&GTCCR
-};
-const timer_s timer1; //= {0, 0, 0, 0, 0, 0};
-const timer_s timer2;
-const timer_s timer3; // = {0, 0, 0, 0, 0, 0};
-const timer_s timer4; // = {0, 0, 0, 0, 0, 0};
-const timer_s timer5; // = {0, 0, 0, 0, 0, 0};
-
-void timer_init(const timer_s *t) {
+void timer_init() {
+	// Make sure timer head pointer is NULL
+	timer_head = 0;
+	// Initialize AVR timer
+	// Zero count
+	TCNT4 = 0;
+	// Enable interrupts
+	TIMSK4 = 0
+		| _BV(OCIE4A)		// Output compare A interrupt enable
+		//| _BV(TOIE4)		// Overflow interrupt enable
+	;
+	// Timer control registers
+	TCCR4A = 0;
+	TCCR4B = 0
+		//| _BV(CS42) 
+		| _BV(CS41) 
+		| _BV(CS40)
+		| _BV(WGM42)		// Clear TC on match
+	;  // clk/64 (4uS)
+	TCCR4C = 0;
+	// Set output compare registers
+	OCR4AH = 0;
+	OCR4AL = 250;
 }
-
-void timer_set_ocr(const timer_s * timer, unsigned char ocr, uint16_t value) {
-	switch (timer->type) {
-		case TIMER_TYPE_0:
-			switch (ocr) {
-				case TIMER_COMPA:
-					*timer->ocral = value;
-					break;
-				case TIMER_COMPB:
-					*timer->ocrbl = value;
-					break;
-			}
-			break;
-		case TIMER_TYPE_1:
-			switch (ocr) {
-				case TIMER_COMPA:
-					*timer->ocrah = value >> 8;
-					*timer->ocral = value;
-					break;
-				case TIMER_COMPB:
-					*timer->ocrbh = value >> 8;
-					*timer->ocrbl = value;
-					break;
-				case TIMER_COMPC:
-					*timer->ocrch = value >> 8;
-					*timer->ocrcl = value;
-					break;
-			}
-			break;
-		case TIMER_TYPE_2:
-			switch (ocr) {
-				case TIMER_COMPA:
-					*timer->ocral = value;
-					break;
-				case TIMER_COMPB:
-					*timer->ocrbl = value;
-					break;
-			}
-			break;
+void timer_start(timer_s *t) {
+	timer_s * u;
+	// Make sure t terminates the list
+	if (t) t->next = 0;
+	// If there's no other timers, make this one the head
+	if (!timer_head) timer_head = t;
+	// Walk to the end of the list
+	u = timer_head;
+	while (u) {
+		if (u == t) return; // Timer is already in the list
+		if (u->next) u=u->next;
+		else {
+			u->next = t; // Found the end, add the new timer
+			return;
+		}
 	}
 }
-
-uint16_t timer_get_ocr(const timer_s * timer, unsigned char ocr) {
-	switch (timer->type) {
-		case TIMER_TYPE_0:
-			switch (ocr) {
-				case TIMER_COMPA:
-					return *timer->ocral;
-					break;
-				case TIMER_COMPB:
-					return *timer->ocrbl;
-					break;
-			}
-			break;
-		case TIMER_TYPE_1:
-			switch (ocr) {
-				case TIMER_COMPA:
-					return *timer->ocral;
-					break;
-				case TIMER_COMPB:
-					return *timer->ocrbl;
-					break;
-				case TIMER_COMPC:
-					return *timer->ocrcl;
-					break;
-			}
-			break;
-		case TIMER_TYPE_2:
-			switch (ocr) {
-				case TIMER_COMPA:
-					return *timer->ocral;
-					break;
-				case TIMER_COMPB:
-					return *timer->ocrbl;
-					break;
-			}
-			break;
+void timer_stop(timer_s *t) {
+	timer_s * u = timer_head;
+	// Check for t at the head
+	if (timer_head == t) {
+		// Unlink t from the list
+		timer_head = t->next;
+		t->next = 0;
+		return;
+	}
+	// Walk the list looking for t
+	while (u) {
+		if (u->next == t) {
+			// Unlink t from the list
+			u->next = t->next;
+			t->next = 0;
+			return;
+		}
+		else u = u->next;
 	}
 }
+void timer_set(timer_s *t, unsigned long c) {
+	t->count = c;
+}
+unsigned long timer_read(timer_s *t) {
+	return t->count;
+}
 
-/* 
-	switch (timer->type) {
-		case TIMER_TYPE_0:
-			break;
-		case TIMER_TYPE_1:
-			break;
-		case TIMER_TYPE_2:
-			break;
-	} 
-*/
+ISR(TIMER4_COMPA_vect) {
+	timer_s * t = timer_head;
+	while (t) {
+		if (t->direction && (t->count < LONG_MAX)) t->count++;
+		else if (t->count > 0) t->count--;
+		t=t->next;
+	}
+}
