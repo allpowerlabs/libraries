@@ -3,13 +3,6 @@
 #include <avr/io.h>
 #include "pwm.h"
 
-//#define PWM0 PWM0
-#define PWM1 PWM1
-#define PWM2 PWM2
-//#define PWM3 PWM3
-#define PWM4 PWM4
-//#define PWM5 PWM5
-
 #ifdef PWM0
 pwm_s PWM0 = {&OCR1A};
 #endif
@@ -94,4 +87,5 @@ void timer3_init(void) {
 
 void pwm_init(void) {
 	timer1_init();
+	timer3_init();
 }
