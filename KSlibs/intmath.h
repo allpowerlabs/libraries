@@ -31,8 +31,8 @@ unsigned u_addlim (unsigned augend, unsigned addend, unsigned limit) {
 }
 // Subtract and limit the result
 inline
-unsigned ul_sublim (unsigned long minuend, unsigned long subtrahend, unsigned long limit) {
-	unsigned x;
+unsigned long ul_sublim (unsigned long minuend, unsigned long subtrahend, unsigned long limit) {
+	unsigned long x;
 	if (minuend < limit) return limit;			// Minuend must already be > limit
 	if (subtrahend > minuend) return limit;		// Avoid unsigned underflow (result < 0)
 	x = minuend - subtrahend;
@@ -41,8 +41,8 @@ unsigned ul_sublim (unsigned long minuend, unsigned long subtrahend, unsigned lo
 }
 // Add and limit the result
 inline
-unsigned ul_addlim (unsigned long augend, unsigned long addend, unsigned long limit) {
-	unsigned x;
+unsigned long ul_addlim (unsigned long augend, unsigned long addend, unsigned long limit) {
+	unsigned long x;
 	if (augend > limit) return limit;			// Augend must be < limit
 	if (addend > limit) return limit;			// Addend must be < limit
 	x = augend + addend;

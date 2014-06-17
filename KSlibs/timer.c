@@ -32,8 +32,6 @@ void timer_init() {
 }
 void timer_start(timer_s *t) {
 	timer_s * u;
-	// Make sure t terminates the list
-	if (t) t->next = 0;
 	// If there's no other timers, make this one the head
 	if (!timer_head) timer_head = t;
 	// Walk to the end of the list
@@ -43,6 +41,8 @@ void timer_start(timer_s *t) {
 		if (u->next) u=u->next;
 		else {
 			u->next = t; // Found the end, add the new timer
+			// Make sure t terminates the list
+			t->next = 0;
 			return;
 		}
 	}

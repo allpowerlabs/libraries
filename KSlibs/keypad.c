@@ -19,7 +19,7 @@ void Kpd_Reset() {
 
 int Kpd_Scan() {
 	unsigned char i, row;
-	Kpd_Reset();  // This fixes a bug where keys aren't read after the display is cleared
+	//Kpd_Reset();  // This fixes a bug where keys aren't read after the display is cleared.  It may also cause a bug with key debouncing.
 	for (i=0; i<4; i++) {
 		SCAN(i);
 		row = ~((PINA & 0xf0) >> 4);  // Read key bits from upper nibble and shift to lower nibble, then invert
