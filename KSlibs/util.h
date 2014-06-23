@@ -12,7 +12,7 @@ extern "C" {
 #define P777222 1
 #define P222777 2
 #define P777722 3
-#define NULL -9999
+//#define NULL -9999
 
 extern int GCU_version; 
 extern int GCU_fill; 
