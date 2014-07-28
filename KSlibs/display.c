@@ -2,7 +2,12 @@
 
 #include "display.h"
 
-#include <wiring.h>
+#if ARDUINO >= 100
+  #include "Arduino.h"
+#else
+  #include <wiring.h>
+#endif
+
 #define DelayMS(n) delay(n)
 
 /*
