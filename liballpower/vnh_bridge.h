@@ -24,7 +24,7 @@ typedef struct {
 	gpio_s enb;
 } vnh_s;
 
-extern const char * PROGMEM vnh_modes[];
+extern const char * vnh_modes[];
 
 #ifdef __cplusplus
 extern "C" {
